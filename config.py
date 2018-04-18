@@ -1,4 +1,7 @@
 DEBUG = True
+import os
+
+SECRET_KEY = os.urandom(24)
 
 DB_USERNAME = 'root'
 DB_PASSWORD = 'root'
@@ -10,3 +13,18 @@ DB_URI = 'mysql+pymysql://%s:%s@%s:%s/%s?charset=utf8' % (DB_USERNAME,DB_PASSWOR
 
 SQLALCHEMY_DATABASE_URI = DB_URI
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+CMS_USER_ID = 'test'
+
+MAIL_SERVER = "smtp.qq.com"
+MAIL_PORT = "587"
+MAIL_USE_TLS = True
+#MAIL_USE_SSL: default
+#False
+# MAIL_DEBUG =
+MAIL_USERNAME = "499634750@qq.com"
+MAIL_PASSWORD= "xyqyseeaofmqbjfi"
+MAIL_DEFAULT_SENDER= "499634750@qq.com"
+# MAIL_MAX_EMAILS: defaultNone
+# MAIL_SUPPRESS_SEND: defaultapp.testing
+# MAIL_ASCII_ATTACHMENTS: defaultFalse
