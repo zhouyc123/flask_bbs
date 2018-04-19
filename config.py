@@ -22,9 +22,9 @@ MAIL_USE_TLS = True
 #MAIL_USE_SSL: default
 #False
 # MAIL_DEBUG =
-MAIL_USERNAME = "499634750@qq.com"
-MAIL_PASSWORD= "xyqyseeaofmqbjfi"
-MAIL_DEFAULT_SENDER= "499634750@qq.com"
+MAIL_USERNAME = ""
+MAIL_PASSWORD= ""
+MAIL_DEFAULT_SENDER= ""
 # MAIL_MAX_EMAILS: defaultNone
 # MAIL_SUPPRESS_SEND: defaultapp.testing
 # MAIL_ASCII_ATTACHMENTS: defaultFalse
