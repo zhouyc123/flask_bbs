@@ -11,13 +11,14 @@ from flask import (
     g,
     jsonify
 )
-from .forms import LoginForm,ResetpwdForm
-from .models import CMSUser
-from .decorators import login_required
+from .forms import LoginForm,ResetpwdForm,ResetEmailForm
+from .models import CMSUser,CMSPersmission
+from .decorators import login_required,permission_required
 import config
 from exts import db,mail
 from flask_mail import Message
-from utils import restful
+from utils import restful,cache
+import string,random
 bp = Blueprint("cms",__name__,url_prefix='/cms')
 #subdomain'cms' 子域名
 #url_prefix  后缀
@@ -38,12 +39,63 @@ def logout():
 def profile():
     return render_template('cms/cms_profile.html')
 
+@bp.route('/email_captcha/')
+def email_captcha():
+    email = request.args.get('email')
+    if not email:
+        return restful.params_error('请输入邮箱')
+    source = list(string.ascii_letters)
+    source.extend(map(lambda x:str(x),range(0,10)))
+    captcha =  "".join(random.sample(source,6))
+    message = Message('bbs 邮箱验证码',recipients=[email],body='您的验证码是：%s' %captcha)
+    try:
+        mail.send(message)
+    except:
+        return restful.server_error()
+    cache.set(email,captcha)
+    return restful.success()
+
+
 @bp.route('/mail/')
 def send_email():
     message = Message('发送邮件测试',recipients=['qqq499634750@163.com'],body='测试')
     mail.send(message)
     return '成功'
 #定义login get请求和post请求  继承 views的methoview
+
+
+@bp.route('/posts/')
+@login_required
+@permission_required(CMSPersmission.POSTER)
+def posts():
+    return render_template('cms/cms_posts.html')
+@bp.route('/comments/')
+@login_required
+@permission_required(CMSPersmission.COMMENTER)
+def comments():
+    return render_template('cms/cms_comments.html')
+@bp.route('/boards/')
+@login_required
+@permission_required(CMSPersmission.BOARDER)
+def boards():
+    return render_template('cms/cms_boards.html')
+@bp.route('/fusers/')
+@login_required
+@permission_required(CMSPersmission.FRONTUSER)
+def fusers():
+    return render_template('cms/cms_fusers.html')
+@bp.route('/cusers/')
+@login_required
+@permission_required(CMSPersmission.CMSUSER)
+def cusers():
+    return render_template('cms/cms_cusers.html')
+@bp.route('/croles/')
+@login_required
+@permission_required(CMSPersmission.ALL_PERMISSION)
+def croles():
+    return render_template('cms/cms_croles.html')
+
+
 class LoginView(views.MethodView):
     def get(self,message=None):
        return render_template('cms/cms_login.html',message=message)
@@ -100,7 +152,17 @@ class ResetEmailView(views.MethodView):
     def get(self):
        return render_template('cms/cms_resetemail.html')
     def post(self):
-        pass
+        form = ResetEmailForm(request.form)
+        if form.validate():
+            email = form.email.data
+            print(email)
+            g.cms_user.email = email
+            # db.session.add()
+            db.session.commit()
+            return restful.success()
+        else:
+            print('1111')
+            return restful.params_error(form.get_error())
 
 
 bp.add_url_rule('/login/',view_func=LoginView.as_view('login'))

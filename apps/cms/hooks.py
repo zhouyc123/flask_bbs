@@ -1,7 +1,7 @@
 #encoding:utf-8
 from .views import bp
 import config
-from .models import CMSUser
+from .models import CMSUser,CMSPersmission
 from flask import session,g
 
 
@@ -15,3 +15,7 @@ def bp_before_request():
         # else:
         #     render_template('cms.login')
         #
+
+@bp.context_processor
+def cms_context_processor():
+    return {"CMSPermission":CMSPersmission}
